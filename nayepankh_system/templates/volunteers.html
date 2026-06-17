@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Volunteers - NayePankh Foundation{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Volunteers</h2>
+    <div>
+        <a href="{{ url_for('export_volunteers') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-upload"></i> Export CSV</a>
+        <a href="{{ url_for('add_volunteer') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Volunteer</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" action="{{ url_for('volunteers') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name, email, city..." value="{{ current_q or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Active" {% if current_status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Inactive" {% if current_status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="city" class="form-select">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if current_city == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>City</th>
+                        <th>Programs</th>
+                        <th>Status</th>
+                        <th>Hours</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for volunteer in volunteers.items %}
+                    <tr>
+                        <td>{{ volunteer.id }}</td>
+                        <td>{{ volunteer.name }}</td>
+                        <td>{{ volunteer.email }}</td>
+                        <td>{{ volunteer.city }}</td>
+                        <td>{{ volunteer.programs_interested }}</td>
+                        <td>
+                            {% if volunteer.status == 'Active' %}
+                                <span class="badge status-active">Active</span>
+                            {% elif volunteer.status == 'Pending' %}
+                                <span class="badge status-pending">Pending</span>
+                            {% else %}
+                                <span class="badge status-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ volunteer.hours_contributed }}</td>
+                        <td>
+                            <a href="{{ url_for('volunteer_detail', id=volunteer.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                            <a href="{{ url_for('edit_volunteer', id=volunteer.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                            <form action="{{ url_for('delete_volunteer', id=volunteer.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this volunteer?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if volunteers.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('volunteers', page=volunteers.prev_num, q=current_q, status=current_status, city=current_city) }}">Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+
+                {% for page_num in volunteers.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if volunteers.page == page_num %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('volunteers', page=page_num, q=current_q, status=current_status, city=current_city) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if volunteers.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('volunteers', page=volunteers.next_num, q=current_q, status=current_status, city=current_city) }}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}

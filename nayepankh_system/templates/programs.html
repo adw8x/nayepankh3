@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Programs - NayePankh Foundation{% endblock %}
+
+{% block content %}
+<h2>Our Programs</h2>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for program, enrolled_count in programs %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ program.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ program.category }}</h6>
+                <p class="card-text">{{ program.description }}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Status:</strong> 
+                    {% if program.status == 'Active' %}
+                        <span class="badge bg-success">Active</span>
+                    {% elif program.status == 'Upcoming' %}
+                        <span class="badge bg-info">Upcoming</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Completed</span>
+                    {% endif %}
+                </li>
+                <li class="list-group-item"><strong>Target Age:</strong> {{ program.target_age_min }} - {{ program.target_age_max }} years</li>
+                <li class="list-group-item"><strong>Location:</strong> {{ program.city }}</li>
+                <li class="list-group-item"><strong>Enrollment:</strong> {{ enrolled_count }} / {{ program.capacity }}</li>
+            </ul>
+            <div class="card-footer">
+                <small class="text-muted">Starts: {{ program.start_date.strftime('%d %b %Y') if program.start_date else 'N/A' }} | Ends: {{ program.end_date.strftime('%d %b %Y') if program.end_date else 'N/A' }}</small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Search - NayePankh Foundation{% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+    <h1>Search</h1>
+    <p class="lead">Find volunteers, beneficiaries, and programs.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <h4>Filters</h4>
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{{ url_for('search') }}">
+                    <input type="hidden" name="q" value="{{ q }}">
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select id="type" name="type" class="form-select">
+                            <option value="all" {% if search_type == 'all' %}selected{% endif %}>All</option>
+                            <option value="volunteer" {% if search_type == 'volunteer' %}selected{% endif %}>Volunteers</option>
+                            <option value="beneficiary" {% if search_type == 'beneficiary' %}selected{% endif %}>Beneficiaries</option>
+                            <option value="program" {% if search_type == 'program' %}selected{% endif %}>Programs</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" name="city" class="form-control" value="{{ city }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <input type="text" id="status" name="status" class="form-control" value="{{ status }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <form method="get" action="{{ url_for('search') }}">
+            <div class="input-group mb-4">
+                <input type="text" name="q" class="form-control form-control-lg" placeholder="Search volunteers, beneficiaries, programs..." value="{{ q }}" required>
+                <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+
+        {% if q %}
+        <div class="mb-3">
+            Found <strong>{{ total_results }}</strong> results for "<strong>{{ q }}</strong>"
+        </div>
+
+        {% if results.volunteers %}
+        <h3 class="mt-4">Volunteers ({{ results.volunteers|length }})</h3>
+        {% for volunteer in results.volunteers %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title"><a href="{{ url_for('volunteer_detail', id=volunteer.id) }}">{{ volunteer.name|safe }}</a></h5>
+                <p class="card-text">{{ volunteer.email|safe }} - {{ volunteer.city|safe }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if results.beneficiaries %}
+        <h3 class="mt-4">Beneficiaries ({{ results.beneficiaries|length }})</h3>
+        {% for beneficiary in results.beneficiaries %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ beneficiary.name|safe }}</h5>
+                <p class="card-text">Program: {{ beneficiary.program.name }} - {{ beneficiary.city|safe }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if results.programs %}
+        <h3 class="mt-4">Programs ({{ results.programs|length }})</h3>
+        {% for program in results.programs %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ program.name|safe }}</h5>
+                <p class="card-text">{{ program.description|truncate(150)|safe }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if total_results == 0 %}
+        <div class="text-center mt-5">
+            <h4>No Results Found</h4>
+            <p>Try adjusting your search terms or filters.</p>
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

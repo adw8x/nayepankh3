@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form_action == 'edit' %}Edit Beneficiary{% else %}Add Beneficiary{% endif %} - NayePankh Foundation{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{% if form_action == 'edit' %}Edit Beneficiary{% else %}Register New Beneficiary{% endif %}</h2>
+        <form method="post" action="{% if form_action == 'edit' %}{{ url_for('edit_beneficiary', id=beneficiary.id) }}{% else %}{{ url_for('add_beneficiary') }}{% endif %}">
+            
+            <div class="row">
+                <!-- Personal Information -->
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ beneficiary.name if beneficiary else '' }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="age" class="form-label">Age</label>
+                    <input type="number" class="form-control" id="age" name="age" value="{{ beneficiary.age if beneficiary else '' }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="Male" {% if beneficiary and beneficiary.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if beneficiary and beneficiary.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if beneficiary and beneficiary.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" value="{{ beneficiary.city if beneficiary else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="school_name" class="form-label">School Name (Optional)</label>
+                    <input type="text" class="form-control" id="school_name" name="school_name" value="{{ beneficiary.school_name if beneficiary else '' }}">
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Program Details -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="program_id" class="form-label">Program</label>
+                    <select class="form-select" id="program_id" name="program_id" required>
+                        {% for program in programs %}
+                        <option value="{{ program.id }}" {% if beneficiary and beneficiary.program_id == program.id %}selected{% endif %}>{{ program.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="enrollment_date" class="form-label">Enrollment Date</label>
+                    <input type="date" class="form-control" id="enrollment_date" name="enrollment_date" value="{{ beneficiary.enrollment_date.strftime('%Y-%m-%d') if beneficiary and beneficiary.enrollment_date else '' }}" required>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Parent/Guardian Information -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="parent_name" class="form-label">Parent/Guardian Name</label>
+                    <input type="text" class="form-control" id="parent_name" name="parent_name" value="{{ beneficiary.parent_name if beneficiary else '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="parent_phone" class="form-label">Parent/Guardian Phone</label>
+                    <input type="tel" class="form-control" id="parent_phone" name="parent_phone" value="{{ beneficiary.parent_phone if beneficiary else '' }}">
+                </div>
+            </div>
+
+            {% if form_action == 'edit' %}
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="Active" {% if beneficiary.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Completed" {% if beneficiary.status == 'Completed' %}selected{% endif %}>Completed</option>
+                        <option value="Dropped" {% if beneficiary.status == 'Dropped' %}selected{% endif %}>Dropped</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="performance_score" class="form-label">Performance Score (0-100)</label>
+                    <input type="number" class="form-control" id="performance_score" name="performance_score" min="0" max="100" value="{{ beneficiary.performance_score if beneficiary and beneficiary.performance_score is not none else '' }}">
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ beneficiary.notes if beneficiary else '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">{% if form_action == 'edit' %}Update Beneficiary{% else %}Add Beneficiary{% endif %}</button>
+                <a href="{{ url_for('beneficiaries') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - NayePankh Foundation{% endblock %}
+
+{% block head_extra %}
+<style>
+    .stats-card { border-left: 5px solid; }
+    .stats-card.blue { border-color: var(--primary); }
+    .stats-card.green { border-color: #28a745; }
+    .stats-card.orange { border-color: #fd7e14; }
+    .stats-card.purple { border-color: #6f42c1; }
+    .chart-container { height: 350px; }
+    .activity-feed .activity-item { border-left: 3px solid #eee; }
+    .activity-feed .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .dot.green { background-color: #28a745; }
+    .dot.orange { background-color: #fd7e14; }
+    .dot.red { background-color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card blue">
+            <div class="card-body">
+                <h5 class="card-title">Total Volunteers</h5>
+                <p class="card-text display-4">{{ total_volunteers }}</p>
+                <small class="text-muted"><i class="bi bi-arrow-up-right"></i> 5% this month</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card green">
+            <div class="card-body">
+                <h5 class="card-title">Total Beneficiaries</h5>
+                <p class="card-text display-4">{{ total_beneficiaries }}</p>
+                <small class="text-muted"><i class="bi bi-arrow-up-right"></i> 12 new</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card orange">
+            <div class="card-body">
+                <h5 class="card-title">Active Programs</h5>
+                <p class="card-text display-4">{{ active_programs }}</p>
+                <small class="text-muted"><i class="bi bi-check-circle"></i> All running</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card purple">
+            <div class="card-body">
+                <h5 class="card-title">Cities Covered</h5>
+                <p class="card-text display-4">{{ cities_covered }}</p>
+                <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Nationwide</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body d-flex justify-content-start gap-2">
+                <a href="{{ url_for('add_volunteer') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Volunteer</a>
+                <a href="{{ url_for('add_beneficiary') }}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Beneficiary</a>
+                <a href="{{ url_for('reports') }}" class="btn btn-warning"><i class="bi bi-bar-chart-fill"></i> Generate Report</a>
+                <a href="{{ url_for('export_volunteers') }}" class="btn btn-info text-white"><i class="bi bi-upload"></i> Export CSV</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Activity Feed -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Beneficiaries per Program</h5>
+                        <div class="chart-container">
+                            <canvas id="beneficiariesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Volunteers by City</h5>
+                        <div class="chart-container">
+                            <canvas id="volunteersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Recent Activity</h5>
+                <ul class="list-unstyled activity-feed">
+                    {% for activity in recent_activities %}
+                    <li class="activity-item ps-3 py-2">
+                        {% if activity.action in ['Added', 'Created'] %}
+                            <span class="dot green"></span>
+                        {% elif activity.action in ['Updated', 'Edited'] %}
+                            <span class="dot orange"></span>
+                        {% elif activity.action in ['Deleted', 'Removed'] %}
+                            <span class="dot red"></span>
+                        {% endif %}
+                        {{ activity.details }}
+                        <small class="d-block text-muted">{{ activity.timestamp.strftime('%b %d, %Y %I:%M %p') }}</small>
+                    </li>
+                    {% else %}
+                    <li>No recent activity.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

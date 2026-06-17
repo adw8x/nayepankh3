@@ -1,0 +1,38 @@
+# Python
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# SQLite database files
+*.db
+*.sqlite3
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment files
+.env
+.env.*
+
+# Exports and generated files
+exports/
+*.pdf
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

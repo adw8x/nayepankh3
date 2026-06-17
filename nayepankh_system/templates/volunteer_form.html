@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form_action == 'edit' %}Edit Volunteer{% else %}Add Volunteer{% endif %} - NayePankh Foundation{% endblock %}
+
+{% block head_extra %}
+<style>
+    .skill-tag {
+        display: inline-block;
+        background-color: var(--primary);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        margin: 2px;
+        font-size: 0.9em;
+    }
+    .skill-tag .remove-tag {
+        margin-left: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{% if form_action == 'edit' %}Edit Volunteer{% else %}New Volunteer Application{% endif %}</h2>
+        <form id="volunteer-form" method="post" action="{% if form_action == 'edit' %}{{ url_for('edit_volunteer', id=volunteer.id) }}{% else %}{{ url_for('add_volunteer') }}{% endif %}">
+            
+            <div class="row">
+                <!-- Personal Information -->
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ volunteer.name if volunteer else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ volunteer.email if volunteer else '' }}" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ volunteer.phone if volunteer else '' }}" pattern="[0-9]{10}" title="10 digit phone number" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" value="{{ volunteer.city if volunteer else '' }}" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="age" class="form-label">Age</label>
+                    <input type="number" class="form-control" id="age" name="age" value="{{ volunteer.age if volunteer else '' }}" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="Male" {% if volunteer and volunteer.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if volunteer and volunteer.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if volunteer and volunteer.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="profession" class="form-label">Profession</label>
+                    <input type="text" class="form-control" id="profession" name="profession" value="{{ volunteer.profession if volunteer else '' }}">
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Volunteering Details -->
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="skills-input" class="form-label">Skills (type a skill and press comma)</label>
+                    <input type="text" class="form-control" id="skills-input">
+                    <div id="skills-container" class="mt-2"></div>
+                    <input type="hidden" id="skills" name="skills" value="{{ volunteer.skills if volunteer else '' }}">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Programs Interested In</label>
+                    <div>
+                        {% for program in programs %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="programs_interested" value="{{ program.name }}" id="prog_{{ program.id }}" {% if volunteer and program.name in volunteer.programs_interested %}checked{% endif %}>
+                            <label class="form-check-label" for="prog_{{ program.id }}">{{ program.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Availability (Days)</label>
+                    <div>
+                        {% for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="availability_days" value="{{ day }}" id="day_{{ day }}" {% if volunteer and day in volunteer.availability_days %}checked{% endif %}>
+                            <label class="form-check-label" for="day_{{ day }}">{{ day }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="hours_per_week" class="form-label">Hours per Week: <span id="hours-display">{{ volunteer.hours_per_week if volunteer else 5 }}</span></label>
+                    <input type="range" class="form-range" id="hours_per_week" name="hours_per_week" min="1" max="20" value="{{ volunteer.hours_per_week if volunteer else 5 }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="mode" class="form-label">Preferred Mode</label>
+                    <select class="form-select" id="mode" name="mode" required>
+                        <option value="Online" {% if volunteer and volunteer.mode == 'Online' %}selected{% endif %}>Online</option>
+                        <option value="Offline" {% if volunteer and volunteer.mode == 'Offline' %}selected{% endif %}>Offline</option>
+                        <option value="Both" {% if volunteer and volunteer.mode == 'Both' %}selected{% endif %}>Both</option>
+                    </select>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="why_volunteer" class="form-label">Why do you want to volunteer?</label>
+                    <textarea class="form-control" id="why_volunteer" name="why_volunteer" rows="3">{{ volunteer.why_volunteer if volunteer else '' }}</textarea>
+                </div>
+            </div>
+
+            {% if form_action == 'edit' %}
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="Pending" {% if volunteer.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Active" {% if volunteer.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Inactive" {% if volunteer.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="hours_contributed" class="form-label">Hours Contributed</label>
+                    <input type="number" class="form-control" id="hours_contributed" name="hours_contributed" value="{{ volunteer.hours_contributed }}">
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">{% if form_action == 'edit' %}Update Volunteer{% else %}Submit Application{% endif %}</button>
+                <a href="{{ url_for('volunteers') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Hours range slider display
+    const hoursInput = document.getElementById('hours_per_week');
+    const hoursDisplay = document.getElementById('hours-display');
+    hoursInput.addEventListener('input', function() {
+        hoursDisplay.textContent = this.value;
+    });
+
+    // Skills tag input
+    const skillsInput = document.getElementById('skills-input');
+    const skillsContainer = document.getElementById('skills-container');
+    const skillsHidden = document.getElementById('skills');
+
+    function renderSkills() {
+        skillsContainer.innerHTML = '';
+        const skills = skillsHidden.value.split(',').filter(s => s.trim() !== '');
+        skills.forEach(skill => {
+            const tag = document.createElement('div');
+            tag.className = 'skill-tag';
+            tag.textContent = skill;
+            const remove = document.createElement('span');
+            remove.className = 'remove-tag';
+            remove.textContent = 'x';
+            remove.onclick = () => removeSkill(skill);
+            tag.appendChild(remove);
+            skillsContainer.appendChild(tag);
+        });
+    }
+
+    function addSkill(skill) {
+        const skills = skillsHidden.value.split(',').filter(s => s.trim() !== '');
+        if (!skills.includes(skill.trim()) && skill.trim() !== '') {
+            skills.push(skill.trim());
+            skillsHidden.value = skills.join(',');
+            renderSkills();
+        }
+    }
+
+    function removeSkill(skill) {
+        let skills = skillsHidden.value.split(',').filter(s => s.trim() !== '');
+        skills = skills.filter(s => s !== skill);
+        skillsHidden.value = skills.join(',');
+        renderSkills();
+    }
+
+    skillsInput.addEventListener('keyup', function(e) {
+        if (e.key === ',') {
+            addSkill(skillsInput.value.slice(0, -1));
+            skillsInput.value = '';
+        }
+    });
+
+    // Initial render
+    renderSkills();
+
+    // Form validation
+    const form = document.getElementById('volunteer-form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+{% endblock %}
