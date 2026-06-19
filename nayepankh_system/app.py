@@ -2,11 +2,11 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_from_directory, Response
 from sqlalchemy import or_
 from datetime import datetime
-from reports import generate_full_report, generate_volunteer_report, generate_beneficiary_report
+from .reports import generate_full_report, generate_volunteer_report, generate_beneficiary_report
 import csv
 import io
 
-from models import db, Volunteer, Beneficiary, Program, ActivityLog
+from .models import db, Volunteer, Beneficiary, Program, ActivityLog
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key-for-local-dev')
