@@ -9,8 +9,8 @@ import io
 from models import db, Volunteer, Beneficiary, Program, ActivityLog
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a_very_secret_key_that_should_be_in_env'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nayepankh.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key-for-local-dev')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nayepankh.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'exports'
 
