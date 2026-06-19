@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "nayepankh_system/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "nayepankh_system/app.py"
+    }
+  ]
+}

@@ -4,3 +4,5 @@ SQLAlchemy
 reportlab
 pandas
 numpy
+gunicorn
+psycopg2-binary
