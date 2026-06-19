@@ -64,7 +64,9 @@ def generate_full_report(volunteers, beneficiaries, programs):
         volunteer_data.append([v.name, v.city, v.status, v.hours_contributed, v.programs_interested])
     
     volunteer_table = Table(volunteer_data, colWidths=[1.5*inch, 1*inch, 0.8*inch, 0.7*inch, 2.5*inch])
-    volunteer_table.setStyle(TableStyle([
+    
+    # Define a reusable style
+    reusable_table_style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -73,7 +75,9 @@ def generate_full_report(volunteers, beneficiaries, programs):
         ('BACKGROUND', (0, 1), (-1, -1), colors.aliceblue),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.aliceblue, colors.lightgrey]),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
-    ]))
+    ])
+    
+    volunteer_table.setStyle(reusable_table_style)
     story.append(volunteer_table)
     story.append(Spacer(1, 0.3 * inch))
 
@@ -84,7 +88,7 @@ def generate_full_report(volunteers, beneficiaries, programs):
         beneficiary_data.append([b.name, b.program.name, b.city, b.status, b.performance_score or 'N/A'])
 
     beneficiary_table = Table(beneficiary_data, colWidths=[1.5*inch, 1.5*inch, 1*inch, 1*inch, 1*inch])
-    beneficiary_table.setStyle(volunteer_table.getStyle()) # reuse style
+    beneficiary_table.setStyle(reusable_table_style) # reuse style
     story.append(beneficiary_table)
     story.append(Spacer(1, 0.3 * inch))
 
@@ -96,7 +100,7 @@ def generate_full_report(volunteers, beneficiaries, programs):
         program_data.append([p.name, enrolled, p.capacity, p.status])
     
     program_table = Table(program_data, colWidths=[2*inch, 1*inch, 1*inch, 1*inch])
-    program_table.setStyle(volunteer_table.getStyle()) # reuse style
+    program_table.setStyle(reusable_table_style) # reuse style
     story.append(program_table)
 
     footer_text = "NayePankh Foundation — Confidential"
